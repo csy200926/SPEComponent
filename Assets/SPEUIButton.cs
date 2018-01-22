@@ -8,17 +8,17 @@ namespace SPEUI
     [RequireComponent(typeof(Button))]
     public class SPEUIButton : SPEUIBase
     {
-        public string m_onClickEvent;
+        public string onClickEvent;
 
-        private Button m_button;
+        private Button button;
 
         // Use this for initialization
         protected override void Awake()
         {
             base.Awake();
             MessageInitilize();
-            m_button = GetComponent<Button>();
-            m_button.onClick.AddListener(delegate { CallEvents(m_onClickEvent); });
+            button = GetComponent<Button>();
+            button.onClick.AddListener(delegate { CallEvents(onClickEvent); });
         }
 
         

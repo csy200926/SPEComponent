@@ -9,28 +9,28 @@ namespace SPEUI
     {
         public string Text
         {
-            get { return m_text.text; }
+            get { return text.text; }
 
-            set { m_text.text = value; }
+            set { text.text = value; }
         }
 
-        public string m_localizationKey = "";
-        private Text m_text;
+        public string localizationKey = "";
+        private Text text;
 
         protected override void Awake()
         {
             base.Awake();
 
-            m_text = GetComponent<Text>();
+            text = GetComponent<Text>();
 
             LocalizeText();
         }
 
         private void LocalizeText()
         {
-            if( m_localizationKey.Length > 0 )
+            if( localizationKey.Length > 0 )
             {
-                m_text.text = LocalizationTableManager.GetLocalizetionText(m_localizationKey,LocalizationCategory.UIText);
+                text.text = LocalizationTableManager.GetLocalizetionText(localizationKey,LocalizationCategory.UIText);
             }
         }
  

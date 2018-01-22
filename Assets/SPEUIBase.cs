@@ -37,18 +37,22 @@ namespace SPEUI
             Height
         }
 
-        public Margin m_margin;
+        // Storage
+        public string customStrData = "";
+        public int customIntData = 0;
 
-        public HorizontalAlign m_horizontalAlgin;
-        public VerticalAlign m_verticalAlign;
-        public Extension m_extension;
+        public Margin margin;
+
+        public HorizontalAlign horizontalAlgin;
+        public VerticalAlign verticalAlign;
+        public Extension extension;
 
         public bool update = false;
 
         private float parentWidth = 0.0f;
         private float parentHeight = 0.0f;
 
-        private RectTransform m_rectTransform;
+        private RectTransform rectTransform;
 
         public string Name
         {
@@ -57,11 +61,11 @@ namespace SPEUI
 
         // Use this for initialization
         protected virtual void Awake () {
-            m_rectTransform = gameObject.GetComponent<RectTransform>();
-            RectTransform m_parentRectTransform = m_rectTransform.parent.GetComponent<RectTransform>();
+            rectTransform = gameObject.GetComponent<RectTransform>();
+            RectTransform parentRectTransform = rectTransform.parent.GetComponent<RectTransform>();
 
-            parentWidth = m_parentRectTransform.GetWidth();
-            parentHeight = m_parentRectTransform.GetHeight();
+            parentWidth = parentRectTransform.GetWidth();
+            parentHeight = parentRectTransform.GetHeight();
 
             RefreshLayout();
 
@@ -70,14 +74,14 @@ namespace SPEUI
         public virtual void RefreshLayout(bool refreshChildren = false)
         {
 
-            RectTransform m_parentRectTransform = m_rectTransform.parent.GetComponent<RectTransform>();
+            RectTransform parentRectTransform = rectTransform.parent.GetComponent<RectTransform>();
 
-            float newParentWidth = m_parentRectTransform.GetWidth();
-            float newParentHeight = m_parentRectTransform.GetHeight();
+            float newParentWidth = parentRectTransform.GetWidth();
+            float newParentHeight = parentRectTransform.GetHeight();
 
             float scale = 1.0f;
 
-            switch(m_extension)
+            switch(extension)
             {
                 case Extension.None:
                     {
@@ -98,51 +102,51 @@ namespace SPEUI
             parentWidth = newParentWidth;
             parentHeight = newParentHeight;
 
-            float width = m_rectTransform.rect.width * scale;
-            float height = m_rectTransform.rect.height * scale;
+            float width = rectTransform.rect.width * scale;
+            float height = rectTransform.rect.height * scale;
 
-            m_rectTransform.SetSize(new Vector2(width, height));
+            rectTransform.SetSize(new Vector2(width, height));
 
 
-            switch (m_horizontalAlgin)
+            switch (horizontalAlgin)
             {
                 case HorizontalAlign.Right:
                     {
-                        m_rectTransform.localPosition = new Vector3(parentWidth - width * 0.5f - m_margin.right, m_rectTransform.localPosition.y, 0);
+                        rectTransform.localPosition = new Vector3(parentWidth - width * 0.5f - margin.right, rectTransform.localPosition.y, 0);
                         break;
                     }
                 case HorizontalAlign.Center:
                     {
-                        m_rectTransform.localPosition = new Vector3(parentWidth * 0.5f, m_rectTransform.localPosition.y, 0);
+                        rectTransform.localPosition = new Vector3(parentWidth * 0.5f, rectTransform.localPosition.y, 0);
                         break;
                     }
                 case HorizontalAlign.Left:
                     {
-                        m_rectTransform.localPosition = new Vector3(width * 0.5f + m_margin.left, m_rectTransform.localPosition.y, 0);
+                        rectTransform.localPosition = new Vector3(width * 0.5f + margin.left, rectTransform.localPosition.y, 0);
                         break;
                     }
             }
 
-            switch(m_verticalAlign)
+            switch(verticalAlign)
             {
 
                 case VerticalAlign.Top:
                     {
-                        m_rectTransform.localPosition = new Vector3(m_rectTransform.localPosition.x, parentHeight - height * 0.5f - m_margin.top, 0);
+                        rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, parentHeight - height * 0.5f - margin.top, 0);
                         break;
                     }
                 case VerticalAlign.Center:
                     {
-                        m_rectTransform.localPosition = new Vector3(m_rectTransform.localPosition.x, parentHeight * 0.5f, 0);
+                        rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, parentHeight * 0.5f, 0);
                         break;
                     }
                 case VerticalAlign.Bottom:
                     {
-                        m_rectTransform.localPosition = new Vector3(m_rectTransform.localPosition.x, height * 0.5f + m_margin.bottom, 0);
+                        rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, height * 0.5f + margin.bottom, 0);
                         break;
                     }
             }
-            m_rectTransform.localPosition -= new Vector3(parentWidth * 0.5f, parentHeight * 0.5f, 0.0f);
+            rectTransform.localPosition -= new Vector3(parentWidth * 0.5f, parentHeight * 0.5f, 0.0f);
 
             if(refreshChildren == true)
             {
@@ -159,11 +163,14 @@ namespace SPEUI
 
         public delegate void UIEventDelegate(SPEUIBase sender);
 
-        private Dictionary<string, MethodInfo> m_callBackMethodMap = new Dictionary<string, MethodInfo>();
-        private List<SPEUIEventHandler> m_parentEventHandlers = new List<SPEUIEventHandler>();
+        private Dictionary<string, MethodInfo> callBackMethodMap = new Dictionary<string, MethodInfo>();
+        private List<SPEUIEventHandler> parentEventHandlers = new List<SPEUIEventHandler>();
+
+
 
         protected void MessageInitilize()
         {
+            //TODO: 需要所有父对象的handler都接收么...
             SPEUIEventHandler[] eventHandlers = GetComponentsInParent<SPEUIEventHandler>(true);
             foreach(SPEUIEventHandler handler in eventHandlers)
             {
@@ -174,27 +181,27 @@ namespace SPEUI
                     var attrbutes = methodinfo.GetCustomAttributes(typeof(UIEventCall), true);
                     if(attrbutes != null && attrbutes.Length > 0)
                     {
-                        m_callBackMethodMap.Add(methodinfo.Name, methodinfo);
+                        callBackMethodMap.Add(methodinfo.Name, methodinfo);
                     }
                 }
             }
-            m_parentEventHandlers = new List<SPEUIEventHandler>(eventHandlers);
+            parentEventHandlers = new List<SPEUIEventHandler>(eventHandlers);
         }
 
         public void CallEvents(string eventName)
         {
             MethodInfo method = null;
-            if(m_callBackMethodMap.TryGetValue(eventName,out method))
+            if(callBackMethodMap.TryGetValue(eventName,out method))
             {
-                for(int i = m_parentEventHandlers.Count - 1; i >= 0; i--)
+                for(int i = parentEventHandlers.Count - 1; i >= 0; i--)
                 {
-                    if(m_parentEventHandlers[i] == null)
+                    if(parentEventHandlers[i] == null)
                     {
-                        m_parentEventHandlers.RemoveAt(i);
+                        parentEventHandlers.RemoveAt(i);
                         continue;
                     }
                     object[] objs = { this };
-                    method.Invoke(m_parentEventHandlers[i], objs);
+                    method.Invoke(parentEventHandlers[i], objs);
                 }
             }
         }
