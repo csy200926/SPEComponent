@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using System.Reflection;
+using UnityEngine;
+using UnityEngine.EventSystems;
 namespace SPEUI
 {
 
@@ -14,25 +15,26 @@ namespace SPEUI
         public float bottom;
     }
 
-    public class SPEUIBase : MonoBehaviour {
+    public class SPEUIBase : MonoBehaviour
+    {
 
         public enum HorizontalAlign
         {
-            Left,
+            Left = 0,
             Center,
             Right
         }
 
         public enum VerticalAlign
         {
-            Top,
+            Top = 0,
             Center,
             Bottom
         }
 
         public enum Extension
         {
-            None,
+            None = 0,
             Width,
             Height
         }
@@ -43,7 +45,7 @@ namespace SPEUI
 
         public Margin margin;
 
-        public HorizontalAlign horizontalAlgin;
+        public HorizontalAlign horizontalAlign;
         public VerticalAlign verticalAlign;
         public Extension extension;
 
@@ -108,7 +110,7 @@ namespace SPEUI
             rectTransform.SetSize(new Vector2(width, height));
 
 
-            switch (horizontalAlgin)
+            switch (horizontalAlign)
             {
                 case HorizontalAlign.Right:
                     {
@@ -217,5 +219,7 @@ namespace SPEUI
             }
 
 	    }
+
+
     }
 }
